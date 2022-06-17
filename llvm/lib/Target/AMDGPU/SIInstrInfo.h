@@ -15,6 +15,7 @@
 #define LLVM_LIB_TARGET_AMDGPU_SIINSTRINFO_H
 
 #include "AMDGPUMIRFormatter.h"
+#include "MCTargetDesc/AMDGPUMCTargetDesc.h"
 #include "SIRegisterInfo.h"
 #include "Utils/AMDGPUBaseInfo.h"
 #include "llvm/ADT/SetVector.h"
@@ -327,9 +328,6 @@ public:
   bool optimizeCompareInstr(MachineInstr &CmpInstr, Register SrcReg,
                             Register SrcReg2, int64_t CmpMask, int64_t CmpValue,
                             const MachineRegisterInfo *MRI) const override;
-
-  unsigned getAddressSpaceForPseudoSourceKind(
-             unsigned Kind) const override;
 
   bool
   areMemAccessesTriviallyDisjoint(const MachineInstr &MIa,
@@ -656,6 +654,11 @@ public:
 
   bool isMAI(uint16_t Opcode) const {
     return get(Opcode).TSFlags & SIInstrFlags::IsMAI;
+  }
+
+  static bool isMFMA(const MachineInstr &MI) {
+    return isMAI(MI) && MI.getOpcode() != AMDGPU::V_ACCVGPR_WRITE_B32_e64 &&
+           MI.getOpcode() != AMDGPU::V_ACCVGPR_READ_B32_e64;
   }
 
   static bool isDOT(const MachineInstr &MI) {

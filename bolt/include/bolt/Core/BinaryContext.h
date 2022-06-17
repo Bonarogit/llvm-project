@@ -239,7 +239,7 @@ public:
   Optional<DWARFUnit *> getDWOCU(uint64_t DWOId);
 
   /// Returns DWOContext if it exists.
-  DWARFContext *getDWOContext();
+  DWARFContext *getDWOContext() const;
 
   /// Get Number of DWOCUs in a map.
   uint32_t getNumDWOCUs() { return DWOCUs.size(); }
@@ -555,6 +555,9 @@ public:
   std::unique_ptr<const MCRegisterInfo> MRI;
 
   std::unique_ptr<MCDisassembler> DisAsm;
+
+  /// Symbolic disassembler.
+  std::unique_ptr<MCDisassembler> SymbolicDisAsm;
 
   std::unique_ptr<MCAsmBackend> MAB;
 

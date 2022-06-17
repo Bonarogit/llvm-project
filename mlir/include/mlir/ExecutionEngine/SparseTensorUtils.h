@@ -15,6 +15,7 @@
 #define MLIR_EXECUTIONENGINE_SPARSETENSORUTILS_H_
 
 #include "mlir/ExecutionEngine/CRunnerUtils.h"
+#include "mlir/ExecutionEngine/Float16bits.h"
 
 #include <cinttypes>
 #include <complex>
@@ -62,14 +63,10 @@ enum class OverheadType : uint32_t {
   DO(8, uint8_t)
 
 // This x-macro calls its argument on every overhead type, including
-// `index_type`.  Our naming convention uses an empty suffix for
-// `index_type`, so the missing first argument when we call `DO`
-// gets resolved to the empty token which can then be concatenated
-// as intended.  (This behavior is standard per C99 6.10.3/4 and
-// C++11 N3290 16.3/4; whereas in C++03 16.3/10 it was undefined behavior.)
+// `index_type`.
 #define FOREVERY_O(DO)                                                         \
   FOREVERY_FIXED_O(DO)                                                         \
-  DO(, index_type)
+  DO(0, index_type)
 
 // These are not just shorthands but indicate the particular
 // implementation used (e.g., as opposed to C99's `complex double`,
@@ -81,12 +78,14 @@ using complex32 = std::complex<float>;
 enum class PrimaryType : uint32_t {
   kF64 = 1,
   kF32 = 2,
-  kI64 = 3,
-  kI32 = 4,
-  kI16 = 5,
-  kI8 = 6,
-  kC64 = 7,
-  kC32 = 8
+  kF16 = 3,
+  kBF16 = 4,
+  kI64 = 5,
+  kI32 = 6,
+  kI16 = 7,
+  kI8 = 8,
+  kC64 = 9,
+  kC32 = 10
 };
 
 // This x-macro only specifies the non-complex `V` types, because the ABI
@@ -101,6 +100,8 @@ enum class PrimaryType : uint32_t {
 #define FOREVERY_SIMPLEX_V(DO)                                                 \
   DO(F64, double)                                                              \
   DO(F32, float)                                                               \
+  DO(F16, f16)                                                                 \
+  DO(BF16, bf16)                                                               \
   DO(I64, int64_t)                                                             \
   DO(I32, int32_t)                                                             \
   DO(I16, int16_t)                                                             \
